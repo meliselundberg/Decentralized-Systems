@@ -1,66 +1,113 @@
-<!-- 
-
-This HTML file provides a simple GUI for interacting with a blockchain system. 
-It includes functionality for creating new transactions, mining blocks, and viewing the blockchain.
-
-Sections:
-1. New Transaction:
-    - Allows the user to input sender, recipient, and amount for a new transaction.
-    - A "Send" button triggers the `sendTransaction` function to send the transaction to the backend.
-
-2. Mine Block:
-    - A "Mine Block" button triggers the `mine` function to mine a new block in the blockchain.
-
-3. Blockchain:
-    - A "Get Chain" button triggers the `getChain` function to fetch and display the current blockchain.
-
-JavaScript Functions:
-- `sendTransaction()`: 
-  Sends a POST request to the `/transactions/new` endpoint with transaction details (sender, recipient, amount, and a random order number).
-  Alerts the user with the server's response.
-
-- `mine()`: 
-  Sends a GET request to the `/mine` endpoint to mine a new block.
-  Alerts the user with the index of the newly mined block.
-
-- `getChain()`: 
-  Sends a GET request to the `/chain` endpoint to fetch the current blockchain.
-  Displays the blockchain in a formatted JSON structure inside the `<pre>` element with the ID `chain`.
-
-Dependencies:
-- The backend server is expected to run on `http://localhost:5001`.
-- The backend should expose the following endpoints:
-  1. POST `/transactions/new` - To create a new transaction.
-  2. GET `/mine` - To mine a new block.
-  3. GET `/chain` - To retrieve the blockchain.
-
-Usage:
-- Open this file in a browser.
-- Use the provided input fields and buttons to interact with the blockchain system.
--->
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blockchain GUI</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      margin: 0;
+    }
+
+    h3 {
+      color: #4CAF50;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    input {
+      width: calc(33% - 10px);
+      padding: 10px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    pre {
+      background: #f4f4f9;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  </style>
 </head>
 <body>
   <h1>Blockchain GUI</h1>
 
-  <h3>New Transaction</h3>
-  <input id="sender" placeholder="Sender">
-  <input id="recipient" placeholder="Recipient">
-  <input id="amount" placeholder="Amount">
-  <button onclick="sendTransaction()">Send</button>
+  <div class="container">
+    <div class="section">
+      <h3>New Transaction</h3>
+      <div class="input-group">
+        <input id="sender" placeholder="Sender">
+        <input id="recipient" placeholder="Recipient">
+        <input id="amount" placeholder="Amount">
+      </div>
+      <button onclick="sendTransaction()">Send</button>
+    </div>
 
-  <h3>Mine Block</h3>
-  <button onclick="mine()">Mine Block</button>
+    <div class="section">
+      <h3>Mine Block</h3>
+      <button onclick="mine()">Mine Block</button>
+    </div>
 
-  <h3>Blockchain</h3>
-  <button onclick="getChain()">Get Chain</button>
-  <pre id="chain"></pre>
+    <div class="section">
+      <h3>Blockchain</h3>
+      <button onclick="getChain()">Get Chain</button>
+      <pre id="chain"></pre>
+    </div>
+  </div>
 
   <script>
     const baseURL = "http://localhost:5001";
