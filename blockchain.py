@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from uuid import uuid4
 
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 
 
 class Blockchain:
@@ -295,6 +295,9 @@ def consensus():
 
     return jsonify(response), 200
 
+@app.route('/gui', methods=['GET'])
+def gui():
+    return send_file('index.html')
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
