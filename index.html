@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blockchain GUI</title>
+  <title>Blockchain GUI (PoS)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -84,7 +84,9 @@
   </style>
 </head>
 <body>
-  <h1>Blockchain GUI</h1>
+  <h1>Blockchain GUI (Proof of Stake)</h1>
+
+  <p><strong>Node ID:</strong> <span id="nodeId">Loading...</span></p>
 
   <div class="container">
     <div class="section">
@@ -98,8 +100,18 @@
     </div>
 
     <div class="section">
-      <h3>Mine Block</h3>
-      <button onclick="mine()">Mine Block</button>
+        <h3>Stake Tokens</h3>
+        <div class="input-group">
+          <input id="stake_amount" placeholder="Amount">
+          <button onclick="stake()">Stake</button>
+          <button onclick="unstake()">Unstake</button>
+        </div>
+        <p><strong>Currently Staked:</strong> <span id="stakeStatus">Loading...</span></p>
+    </div>
+      
+    <div class="section">
+      <h3>Validate Block</h3>
+      <button onclick="validate()">Validate</button>
     </div>
 
     <div class="section">
@@ -110,35 +122,98 @@
   </div>
 
   <script>
-    const baseURL = "http://localhost:5001";
+    const baseURL = window.location.origin;
+
+    let nodeId = "";
+
+    window.onload = function () {
+      fetch(baseURL + "/id")
+        .then(res => res.json())
+        .then(data => {
+          nodeId = data.node_id;
+          document.getElementById("nodeId").textContent = nodeId;
+          updateStakeStatus();
+          syncChain();  // if you have this function
+          getChain();
+        });
+    };
 
     function sendTransaction() {
-      const data = {
-        sender: document.getElementById("sender").value,
-        recipient: document.getElementById("recipient").value,
-        amount: parseInt(document.getElementById("amount").value),
-        order: Math.floor(Math.random() * 100000)
+        const data = {
+          sender: document.getElementById("sender").value,
+          recipient: document.getElementById("recipient").value,
+          amount: parseFloat(document.getElementById("amount").value),
+          order: Math.floor(Math.random() * 100000)
+        };
+        fetch(baseURL + "/transactions/new", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        }).then(res => res.json()).then(alert);
       };
-      fetch(baseURL + "/transactions/new", {
+
+    function validate() {
+        fetch(baseURL + "/validate", {
+          method: "POST"
+        })
+          .then(res => res.json())
+          .then(data => {
+            alert(data.message || "Block validated");
+            getChain();
+          });
+      };
+
+    function getChain() {
+        fetch(baseURL + "/chain")
+          .then(res => res.json())
+          .then(data => {
+            document.getElementById("chain").textContent = JSON.stringify(data.chain, null, 2);
+          });
+      };
+
+      function updateStakeStatus() {
+        fetch(baseURL + "/stake/status")
+          .then(res => res.json())
+          .then(data => {
+            const amount = data[nodeId] !== undefined ? data[nodeId] : "0";
+            document.getElementById("stakeStatus").textContent = amount;
+          })
+          .catch(error => {
+            console.error("Failed to fetch stake status:", error);
+            document.getElementById("stakeStatus").textContent = "0";
+          });
+      }
+
+    function stake() {
+      const data = {
+        node_id: nodeId,
+        amount: parseFloat(document.getElementById("stake_amount").value)
+      };
+      fetch(baseURL + "/stake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-      }).then(res => res.json()).then(alert);
-    }
-
-    function mine() {
-      fetch(baseURL + "/mine")
+      })
         .then(res => res.json())
-        .then(data => alert("Block mined: " + data.index));
-    }
-
-    function getChain() {
-      fetch(baseURL + "/chain")
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById("chain").textContent = JSON.stringify(data.chain, null, 2);
+        .then(res => {
+          alert(res.message);
+          updateStakeStatus();
         });
     }
+    // Makes sure you can unstake tokens
+    function unstake() {
+      fetch(baseURL + "/unstake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ node_id: nodeId })
+      })
+        .then(res => res.json())
+        .then(res => {
+          alert(res.message);
+          updateStakeStatus();
+        });
+  }
+
   </script>
 </body>
 </html>
