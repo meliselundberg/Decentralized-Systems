@@ -1,10 +1,10 @@
-# 📦 Blockchain – Function Overview
+# Blockchain – Function Overview
 
 This Python-based blockchain implementation supports transactions, mining (Proof of Work), and peer-to-peer synchronization via a simple Flask API.
 
 ---
 
-## 🔧 Core Functions
+## Core Functions
 
 ### `__init__(self)`
 Initializes the blockchain:
@@ -24,7 +24,7 @@ The index of the block where the transaction will be recorded.
 ---
 
 ### `new_block(proof, previous_hash)`
-Creates a new block containing current transactions.
+Creates a new block containing the current transactions.
 
 **Includes:**  
 Index, timestamp, transactions, proof, and previous hash.
@@ -63,7 +63,7 @@ Registers a new peer node to enable future synchronization.
 
 ---
 
-## 🌐 API Endpoints (Flask)
+## API Endpoints (Flask)
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
@@ -74,3 +74,23 @@ Registers a new peer node to enable future synchronization.
 | `/nodes/resolve` | GET | Runs the consensus algorithm |
 
 ---
+
+---
+
+## Updates: Transition to Proof of Stake (PoS)
+
+The original Proof of Work mechanism was replaced with a probabilistic Proof of Stake system. Below are the key additions and modifications made to support this transition:
+
+### `self.stakes`
+A dictionary that tracks each node’s staked value (used to calculate validator probability).
+
+### `self.seen_stakes`
+A set that stores unique node IDs that have already submitted a stake, used to prevent duplicate staking across peers.
+
+### `register_stake(node_id, amount)`
+Registers a node’s stake.  
+- If the node ID is already in `seen_stakes`, the stake is ignored.  
+- Used via the `/stake` endpoint for API interaction.
+
+### `choose_validator()`
+Selects the next block validator using a random weighted selection based on stake:
